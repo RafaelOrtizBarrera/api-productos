@@ -9,6 +9,7 @@ import (
 	"mime/multipart"
 	"os"
 
+	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/gridfs"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -17,7 +18,7 @@ import (
 func conexionMongoDB() *mongo.Client {
 	var err error
 	var client *mongo.Client
-	uri := "mongodb://localhost:27017"
+	uri := viper.GetString("mongo.url")
 	opts := options.Client()
 	opts.ApplyURI(uri)
 	opts.SetMaxPoolSize(5)
@@ -35,10 +36,10 @@ func uploadFileMongo(file multipart.File, filename string) {
 	}
 
 	conn := conexionMongoDB()
-	bicicleta := "images-bicicleta"
+	bucketProducto := viper.GetString("mongo.bucket")
 	bucket, err := gridfs.NewBucket(
-		conn.Database("bike-store"),
-		&options.BucketOptions{Name: &bicicleta},
+		conn.Database(viper.GetString("mongo.dataBase")),
+		&options.BucketOptions{Name: &bucketProducto},
 	)
 	if err != nil {
 		log.Fatal(err)
